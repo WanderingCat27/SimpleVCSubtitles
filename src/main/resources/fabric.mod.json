@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "id": "voicechatsubtitles",
+  "version": "${version}",
+  "name": "VoicechatSubtitles",
+  "description": "",
+  "authors": [],
+  "contact": {
+    "repo": "https://github.com/chr/VoicechatSubtitles"
+  },
+  "license": "All-Rights-Reserved",
+  "icon": "assets/voicechatsubtitles/icon.png",
+  "environment": "client",
+  "entrypoints": {
+    "client": [
+      "org.notdev.voicechatsubtitles.client.VoicechatSubtitlesClient"
+    ],
+    "voicechat": [
+      "org.notdev.voicechatsubtitles.VoiceChatPlugin"
+    ],
+    "main": [
+      "org.notdev.voicechatsubtitles.VoicechatSubtitles"
+    ]
+  },
+  "mixins": [
+    "voicechatsubtitles.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=${loader_version}",
+    "fabric": "*",
+    "minecraft": "${minecraft_version}"
+  }
+}

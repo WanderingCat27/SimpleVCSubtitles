@@ -19,7 +19,6 @@ public class VoicechatSubtitles implements ModInitializer {
     @Override
     public void onInitialize() {
 
-
     }
 
 

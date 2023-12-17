@@ -2,6 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/SimpleVCSubtitles.main.iml" filepath="$PROJECT_DIR$/.idea/modules/SimpleVCSubtitles.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/SimpleVCSubtitles.test.iml" filepath="$PROJECT_DIR$/.idea/modules/SimpleVCSubtitles.test.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/VoicechatSubtitles.main.iml" filepath="$PROJECT_DIR$/.idea/modules/VoicechatSubtitles.main.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/VoicechatSubtitles.test.iml" filepath="$PROJECT_DIR$/.idea/modules/VoicechatSubtitles.test.iml" />
     </modules>

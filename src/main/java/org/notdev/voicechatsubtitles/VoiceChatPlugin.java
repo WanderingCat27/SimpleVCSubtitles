@@ -4,22 +4,17 @@ import com.mojang.authlib.minecraft.client.MinecraftClient;
 import de.maxhenkel.voicechat.VoicechatClient;
 import de.maxhenkel.voicechat.api.VoicechatApi;
 import de.maxhenkel.voicechat.api.VoicechatPlugin;
-import de.maxhenkel.voicechat.api.events.ClientEvent;
 import de.maxhenkel.voicechat.api.events.ClientReceiveSoundEvent;
 import de.maxhenkel.voicechat.api.events.EventRegistration;
 import de.maxhenkel.voicechat.api.mp3.Mp3Encoder;
 import de.maxhenkel.voicechat.plugins.impl.mp3.Mp3EncoderImpl;
 import de.maxhenkel.voicechat.voice.client.SoundManager;
+import net.minecraft.text.Text;
 import org.notdev.voicechatsubtitles.client.VoicechatSubtitlesClient;
 
 import javax.sound.sampled.*;
 import java.io.*;
-import java.nio.ByteBuffer;
 import java.nio.file.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.function.Consumer;
-import java.util.function.Function;
 
 public class VoiceChatPlugin implements VoicechatPlugin {
 
@@ -28,8 +23,8 @@ public class VoiceChatPlugin implements VoicechatPlugin {
 
     File outputFile;
 
-    final int max = 960 * 75;
-    final int numSections = 10;
+    final int max = 960 * 150;
+    final int numSections = 2;
 
     int sectionIndex;
     int fileIndex;
@@ -54,12 +49,17 @@ public class VoiceChatPlugin implements VoicechatPlugin {
      */
     @Override
     public void initialize(VoicechatApi api) {
+
+
+
         outputFile = new File("test");
 
         Thread monitor = new Thread(new Runnable() {
             @Override
             public void run() {
                 try {
+                    File dir = new File("whisper-output");
+                    while(!dir.exists());
                     // Specify the directory to monitor
                     Path directory = Paths.get("whisper-output");
 
@@ -72,14 +72,16 @@ public class VoiceChatPlugin implements VoicechatPlugin {
 
                         for (WatchEvent<?> event : key.pollEvents()) {
                             Path filePath = (Path) event.context();
+
                             if (filePath.toString().endsWith(".txt")) {
                                 // Print file contents
                                 try {
                                     String fileContent = Files.readString(directory.resolve(filePath));
-                                    outputString = fileContent;
-
+                                    if(!fileContent.equalsIgnoreCase("I'm going to make a small hole in the middle of the hole."))
+                                    VoicechatSubtitlesClient.CLIENT.player.sendMessage(Text.literal("[subtitles]: " + fileContent));
                                     // Delete the file
-                                    Files.delete(directory.resolve(filePath));
+                                    File toDelete = new File(String.valueOf(directory.resolve(filePath)));
+                                    while(!toDelete.delete());
                                 } catch (IOException e) {
                                     e.printStackTrace();
                                 }
@@ -105,6 +107,7 @@ public class VoiceChatPlugin implements VoicechatPlugin {
     @Override
     public void registerEvents(EventRegistration registration) {
         registration.registerEvent(ClientReceiveSoundEvent.EntitySound.class, this::receiveSound);
+
 
     }
 

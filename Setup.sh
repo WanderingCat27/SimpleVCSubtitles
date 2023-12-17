@@ -6,7 +6,7 @@ if [ $# -eq 0 ]; then
     exit 1
 fi
 
-# Store the provided directory in a variable
+# Store the provided directory in a vººariable
 target_directory="$1"
 
 # Check if the provided path is a valid directory

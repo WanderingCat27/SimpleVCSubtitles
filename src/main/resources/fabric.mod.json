@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "id": "subtitlesv2",
+  "version": "${version}",
+  "name": "SubtitlesV2",
+  "description": "",
+  "authors": [],
+  "contact": {
+    "repo": "https://github.com/christiankilduff/SubtitlesV2"
+  },
+  "license": "All-Rights-Reserved",
+  "icon": "assets/subtitlesv2/icon.png",
+  "environment": "client",
+  "entrypoints": {
+    "client": [
+      "com.notdev.subtitlesv2.client.SubtitlesV2Client"
+    ],
+    "voicechat": [
+      "com.notdev.subtitlesv2.client.VoicechatPlugin"
+    ]
+  },
+  "depends": {
+    "fabricloader": ">=${loader_version}",
+    "fabric": "*",
+    "minecraft": "${minecraft_version}",
+    "voicechat": ">=${minecraft_version}-${voicechat_api_version}"
+  }
+}

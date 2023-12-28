@@ -23,6 +23,9 @@ public class SubtitlesV2Client implements ClientModInitializer {
 
     private static ArrayList<String> subtitles = new ArrayList<>(10);
 
+    private static File config = new File("config/subtitles.config");
+
+    private static Path whisper_cppPath;
 
     @Override
     public void onInitializeClient() {
@@ -38,8 +41,38 @@ public class SubtitlesV2Client implements ClientModInitializer {
         createFile = new File("whisper/output");
         if (!createFile.exists())
             while (!createFile.mkdirs()) ;
+        if (!config.exists()) {
+            try {
+                while (!config.createNewFile()) ;
+                Files.write(config.toPath(), "path: \"insert/path/here\"".getBytes(StandardCharsets.UTF_8));
+            } catch (IOException e) {
+                throw new RuntimeException("Pl");
+            }
+        }
 
+        try {
+            if (!getConfigPath().equalsIgnoreCase("insert/path/here"))
+                whisper_cppPath = Paths.get(getConfigPath());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
+    // hacky config solution dont feel like dealing with json rn
+    public static String getConfigPath() throws IOException {
+        Path path = config.toPath();
+
+        // Read all lines from the file into a List of Strings
+        List<String> lines = Files.readAllLines(path);
+
+        // Print each line from the file
+        for (String line : lines) {
+            if (line.contains("path")) {
+                return line.split("\"")[1];
+            }
+        }
+
+        return null;
     }
 
 
@@ -81,16 +114,16 @@ public class SubtitlesV2Client implements ClientModInitializer {
 
     public static void initTranscriberThread(String file) {
         new Thread(() -> {
-                    System.out.println("transcribing");
-                    try {
-                        transcribe(file);
-                    } catch (IOException e) {
-                        System.out.println("io");
-                    } catch (InterruptedException e) {
-                        System.out.println("interupted");
-                    } catch (ExecutionException e) {
-                        System.out.println("execution error");
-                    }
+            System.out.println("transcribing");
+            try {
+                transcribe(file);
+            } catch (IOException e) {
+                System.out.println("io " + e.toString());
+            } catch (InterruptedException e) {
+                System.out.println("interupted " + e.toString());
+            } catch (ExecutionException e) {
+                System.out.println("execution error " + e.toString());
+            }
         }).start();
         System.out.println("started thread");
 
@@ -104,13 +137,16 @@ public class SubtitlesV2Client implements ClientModInitializer {
         Path file_path = Paths.get("whisper", "input", file);
         Path resolvedPath_file = file_path.normalize();
 
-        Path output_dir = Paths.get("whisper", "output");
+        Path output_dir = Paths.get("whisper", "output", file.replaceAll(".wav", ""));
         Path resolvedPath_output = output_dir.normalize();
 
         if (isWindows) {
-            builder.command("cmd.exe", "/c", "dir");
+            System.out.println("running: " +"cd " + whisper_cppPath + "&.\\main.exe -f \"" + resolvedPath_file.toAbsolutePath() +  "\" --model ggml-model-whisper-base.bin -otxt -of \"" + resolvedPath_output.toAbsolutePath() + "\" -d 10000");
+            builder.command("cmd.exe", "/c", "cd " + whisper_cppPath + "&.\\main.exe -f \"" + resolvedPath_file.toAbsolutePath() +  "\" --model ggml-model-whisper-base.bin -otxt -of \"" + resolvedPath_output.toAbsolutePath() + "\" -d 10000");
+
         } else {
-            builder.command("sh", "-c", " export PATH=ffmpeg:$PATH; source env/bin/activate; whisper " + resolvedPath_file + " --model base --language English --output_dir " + resolvedPath_output + " --output_format txt");
+            System.out.println("running: " + "cd " + whisper_cppPath + ";./main -f \"" + resolvedPath_file.toAbsolutePath() +  "\" --model models/ggml-base.bin -otxt -of \"" + resolvedPath_output.toAbsolutePath() + "\" -d 10000");
+            builder.command("sh", "-c", "cd " + whisper_cppPath + ";./main -f \"" + resolvedPath_file.toAbsolutePath() +  "\" --model models/ggml-base.bin -otxt -of \"" + resolvedPath_output.toAbsolutePath() + "\" -d 10000");
         }
         Process process = builder.start();
 
@@ -131,14 +167,19 @@ public class SubtitlesV2Client implements ClientModInitializer {
             assertEquals(0, exitCode);
         }
 
-        sendMessage(readFileToString("whisper/output/"+file.replaceAll("mp3", "txt")));
+        System.out.println("attempting to send message of " + resolvedPath_output.toAbsolutePath());
+        sendMessage(readFileToString(resolvedPath_output));
     }
 
-    public static String readFileToString(String filePath) throws IOException {
-        Path path = Paths.get(filePath);
-        byte[] encodedBytes = Files.readAllBytes(path);
-        return new String(encodedBytes);
+    public static String readFileToString(Path filePath) throws IOException {
+        String str = Files.readString(Path.of(filePath.toAbsolutePath() + ".txt"));
+        File out =new File(String.valueOf(filePath));
+        out.deleteOnExit();
+        out.delete();
+        return str;
     }
+
+
 
     static class StreamGobbler implements Runnable {
         private final InputStream inputStream;

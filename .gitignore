@@ -99,6 +99,7 @@ $RECYCLE.BIN/
 
 # Windows shortcuts
 *.lnk
+ggml-base.bin
 
 .gradle
 build/
@@ -109,7 +110,7 @@ gradle-app.setting
 # Cache of project
 .gradletasknamecache
 
-**/build/
+build/
 
 # Common working directory
 run/

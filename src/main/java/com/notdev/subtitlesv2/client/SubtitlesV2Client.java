@@ -17,7 +17,6 @@ public class SubtitlesV2Client implements ClientModInitializer {
     public static String MOD_ID = "subtitlesvc";
     @Override
     public void onInitializeClient() {
-
         try {
             downloadFile("https://ggml.ggerganov.com/ggml-model-whisper-base.bin", "models", "ggml-base.bin");
         } catch (IOException e) {

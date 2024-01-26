@@ -122,7 +122,7 @@ public class Transcriber {
             // if i throw out a bunch of the data it seems get down to the format that whisper wants
             mono[index/4] = Float.max(-1f, Float.min((samples[index]) / (float) Short.MAX_VALUE, 1f));
         }
-        saveFloatArrayToMp3(mono, 16000, "test.mp3");
+//        saveFloatArrayToMp3(mono, 16000, "test.mp3");
 
         var params = new WhisperFullParams();
         System.out.println(ctx);

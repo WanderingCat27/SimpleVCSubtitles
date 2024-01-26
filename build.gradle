@@ -7,9 +7,6 @@ plugins {
 // ... other configurations ...
 shadowJar {
     doLast {
-        // Optional: Rename the shadow JAR file if needed
-        archiveFileName = "your-desired-name.jar"
-
         // Include only the classes from the whisper-jni JAR in the fat JAR
         def whisperJniDependency = configurations.runtimeClasspath.find { it.name.startsWith('whisper-jni') }
         if (whisperJniDependency) {
@@ -20,6 +17,7 @@ shadowJar {
             println "Warning: whisper-jni dependency not found."
         }
     }
+
 }
 version = project.mod_version
 group = project.maven_group

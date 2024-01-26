@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
-  "id": "subtitlesv2",
+  "id": "subtitles",
   "version": "${version}",
-  "name": "SubtitlesV2",
+  "name": "SubtitlesSimpleVoiceChat",
   "description": "",
   "authors": [],
   "contact": {

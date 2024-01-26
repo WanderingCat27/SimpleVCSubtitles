@@ -15,65 +15,18 @@ import java.util.List;
 
 public class SubtitlesV2Client implements ClientModInitializer {
     public static String MOD_ID = "subtitlesvc";
-
-
-    private static File config = new File("config/subtitles.config");
-
     @Override
     public void onInitializeClient() {
-
         try {
-            downloadFile("https://raw.githubusercontent.com/WanderingCat27/SimpleVCSubtitlesV2/jni/ggml-base.bin", "models", "ggml-base.bin");
+            downloadFile("https://ggml.ggerganov.com/ggml-model-whisper-base.bin", "models", "ggml-base.bin");
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
 
         Transcriber.init();
-
-
-        // read python file
-//        CLASSLOADER = Thread.currentThread().getContextClassLoader();
-
-        // create directories
-//        File createFile = new File("whisper/input");
-//        if (!createFile.exists())
-//            while (!createFile.mkdirs()) ;
-//        createFile = new File("whisper/output");
-//        if (!createFile.exists())
-//            while (!createFile.mkdirs()) ;
-//        if (!config.exists()) {
-//            try {
-//                while (!config.createNewFile()) ;
-//                Files.write(config.toPath(), "path: \"insert/path/here\"".getBytes(StandardCharsets.UTF_8));
-//            } catch (IOException e) {
-//                throw new RuntimeException("Pl");
-//            }
-//        }
-
-//        try {
-//            if (!getConfigPath().equalsIgnoreCase("insert/path/here"))
-//                whisper_cppPath = Paths.get(getConfigPath());
-//        } catch (IOException e) {
-//            throw new RuntimeException(e);
-//        }
     }
 
-    // hacky config solution dont feel like dealing with json rn
-    public static String getConfigPath() throws IOException {
-        Path path = config.toPath();
 
-        // Read all lines from the file into a List of Strings
-        List<String> lines = Files.readAllLines(path);
-
-        // Print each line from the file
-        for (String line : lines) {
-            if (line.contains("path")) {
-                return line.split("\"")[1];
-            }
-        }
-
-        return null;
-    }
 
     public static void downloadFile(String url, String directory, String fileName) throws IOException {
         Path filePath = Paths.get(directory, fileName);
@@ -87,6 +40,7 @@ public class SubtitlesV2Client implements ClientModInitializer {
         // Create the directory if it doesn't exist
         if (!Files.exists(Paths.get(directory))) {
             Files.createDirectory(Paths.get(directory));
+            System.out.println("created dir at " + Paths.get(directory).toAbsolutePath());
         }
 
         // Open a connection to the URL and create an input stream
@@ -100,7 +54,7 @@ public class SubtitlesV2Client implements ClientModInitializer {
                 outputStream.write(buffer, 0, bytesRead);
             }
 
-            System.out.println("File downloaded to: " + filePath);
+            System.out.println("File downloaded to: " + filePath.toAbsolutePath());
 
         } catch (IOException e) {
             e.printStackTrace();

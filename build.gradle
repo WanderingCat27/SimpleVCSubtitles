@@ -1,6 +1,7 @@
 plugins {
     id 'fabric-loom' version '1.2-SNAPSHOT'
     id 'maven-publish'
+    id 'com.github.johnrengelman.shadow' version "${shadow_version}" apply false
 }
 
 version = project.mod_version
@@ -34,13 +35,27 @@ dependencies {
 
     // Fabric API. This is technically optional, but you probably want it anyway.
     modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
-
-    implementation 'com.google.code.findbugs:jsr305:3.0.2'
-
+    implementation(files('lib/whisper-jni-1.5.2.jar'))
     implementation "de.maxhenkel.voicechat:voicechat-api:${voicechat_api_version}"
 
     modImplementation "maven.modrinth:simple-voice-chat:fabric-${voicechat_mod_version}"
-    implementation 'io.github.givimad:whisper-jni:1.5.2'
+}
+
+task buildWithDependencies {
+    dependsOn build
+
+    doLast {
+        // Copy the custom JAR to the build/libs directory
+        copy {
+            from 'lib'
+            include 'whisper-jni-1.5.2.jar'
+            into file("${buildDir}/libs")
+        }
+
+        // Execute your custom build logic here
+
+        // Additional steps if needed after the 'build' task
+    }
 }
 
 processResources {
@@ -85,6 +100,11 @@ java {
 jar {
     from("LICENSE") {
         rename { "${it}_${project.archivesBaseName}"}
+    }
+
+    // Merge the contents of whisper-jni-1.5.2.jar into your project JAR
+    from(zipTree(file("${buildDir}/libs/whisper-jni-1.5.2.jar"))) {
+        into 'libs' // Specify the directory where the contents should be placed within your project's JAR
     }
 }
 

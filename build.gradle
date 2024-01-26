@@ -1,8 +1,26 @@
 plugins {
     id 'fabric-loom' version '1.2-SNAPSHOT'
     id 'maven-publish'
+    id 'com.github.johnrengelman.shadow' version "${shadow_version}" apply true
 }
 
+// ... other configurations ...
+shadowJar {
+    doLast {
+        // Optional: Rename the shadow JAR file if needed
+        archiveFileName = "your-desired-name.jar"
+
+        // Include only the classes from the whisper-jni JAR in the fat JAR
+        def whisperJniDependency = configurations.runtimeClasspath.find { it.name.startsWith('whisper-jni') }
+        if (whisperJniDependency) {
+            configurations = [whisperJniDependency.map { zipTree(it) }]
+        } else {
+            // Handle the case where whisper-jni dependency is not found
+            // You can print a warning or take appropriate action
+            println "Warning: whisper-jni dependency not found."
+        }
+    }
+}
 version = project.mod_version
 group = project.maven_group
 
@@ -23,6 +41,7 @@ repositories {
     }
     mavenLocal()
     maven { url "https://oss.sonatype.org/content/repositories/snapshots" }
+    maven {url "https://clojars.org/repo"}
 }
 
 dependencies {
@@ -33,13 +52,12 @@ dependencies {
 
     // Fabric API. This is technically optional, but you probably want it anyway.
     modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
-
-    implementation 'com.google.code.findbugs:jsr305:3.0.2'
+    implementation(files('lib/whisper-jni-1.5.2.jar'))
+    runtimeOnly(files('lib/whisper-jni-1.5.2.jar'))
 
     implementation "de.maxhenkel.voicechat:voicechat-api:${voicechat_api_version}"
 
     modImplementation "maven.modrinth:simple-voice-chat:fabric-${voicechat_mod_version}"
-
 }
 
 processResources {
@@ -69,23 +87,24 @@ tasks.withType(JavaCompile).configureEach {
     }
 }
 
-java {
-    def javaVersion = JavaVersion.toVersion(targetJavaVersion)
-    if (JavaVersion.current() < javaVersion) {
-        toolchain.languageVersion = JavaLanguageVersion.of(targetJavaVersion)
-    }
-    archivesBaseName = project.archives_base_name
-    // Loom will automatically attach sourcesJar to a RemapSourcesJar task and to the "build" task
-    // if it is present.
-    // If you remove this line, sources will not be generated.
-    withSourcesJar()
-}
-
 jar {
     from("LICENSE") {
-        rename { "${it}_${project.archivesBaseName}"}
+        rename { "${it}_${project.archivesBaseName}" }
+    }
+
+    // Include only the classes from the whisper-jni JAR
+    doFirst {
+        def whisperJniDependency = configurations.runtimeClasspath.find { it.name.startsWith('whisper-jni') }
+        if (whisperJniDependency) {
+            from(zipTree(whisperJniDependency))
+        } else {
+            // Handle the case where whisper-jni dependency is not found
+            // You can print a warning or take appropriate action
+            println "Warning: whisper-jni dependency not found."
+        }
     }
 }
+
 
 // configure the maven publication
 publishing {

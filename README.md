@@ -1,6 +1,6 @@
 # live captioning of SimpleVc mod
 
-(unaffilated with simplevc mod and developer)
+(unaffilated with simplevc mod independent plugin)
 
 working beta of subtitles for simple vc in minecraft. Uses whisper https://github.com/openai/whisper.
 

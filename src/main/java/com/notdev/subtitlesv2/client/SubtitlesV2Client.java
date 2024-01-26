@@ -41,6 +41,7 @@ public class SubtitlesV2Client implements ClientModInitializer {
         // Create the directory if it doesn't exist
         if (!Files.exists(Paths.get(directory))) {
             Files.createDirectory(Paths.get(directory));
+            System.out.println("created dir at " + Paths.get(directory).toAbsolutePath());
         }
 
         // Open a connection to the URL and create an input stream
@@ -54,7 +55,7 @@ public class SubtitlesV2Client implements ClientModInitializer {
                 outputStream.write(buffer, 0, bytesRead);
             }
 
-            System.out.println("File downloaded to: " + filePath);
+            System.out.println("File downloaded to: " + filePath.toAbsolutePath());
 
         } catch (IOException e) {
             e.printStackTrace();

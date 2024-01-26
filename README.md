@@ -2,7 +2,7 @@
 
 (unaffilated with simplevc mod independent plugin)
 
-"working" beta (wip unreleased) of subtitles for simple vc in minecraft. Uses whisper https://github.com/openai/whisper. specifically master branch uses https://github.com/ggerganov/whisper.cpp (working but requires setup steps not provided)
+"working" beta (wip unreleased) of subtitles for simple vc in minecraft. Uses whisper https://github.com/openai/whisper. specifically master branch uses https://github.com/ggerganov/whisper.cpp (working but requires setup steps not currently provided)
 
 
 This is in progress, trying to reduce the barrier to entry while maintaining speed using fast whisper versions like whisper.cpp

@@ -12,7 +12,7 @@ public class VoicechatPlugin implements de.maxhenkel.voicechat.api.VoicechatPlug
     private int bufferIndex = 0;
     private short[] buffer = new short[960 * (max + 2)];
 
-//    static AudioFormat stereoFormat = new AudioFormat(AudioFormat.Encoding.PCM_SIGNED, 16000, 16, 2, 2, 16000, true);
+    static AudioFormat stereoFormat = new AudioFormat(AudioFormat.Encoding.PCM_SIGNED, 16000, 16, 2, 2, 16000, true);
 
     @Override
     public String getPluginId() {

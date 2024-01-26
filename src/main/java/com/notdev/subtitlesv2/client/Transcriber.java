@@ -35,16 +35,24 @@ public class Transcriber {
     }
 
 
-    public static String Transcribe(short[] shorts) {
-        float samples[] = shortsToFloats(shorts);
+    // tried but only kinda works
+    private static float[] toFloat(short[] shorts) {
+        // transform the samples to f32 samples
+        float[] samples = new float[shorts.length];
+       for(int i = 0; i < samples.length; i++)
+            samples[i] = Float.max(-1f, Float.min(((float) shorts[i]) / (float) Short.MAX_VALUE, 1f));
+        return samples;
+    }
 
+    public static String Transcribe(short[] shorts) {
+        // voice chat built in method
+        float samples[] = shortsToFloats(shorts);
         float mono[] = new float[samples.length/2];
         int monoIndex = 0;
         for(int index = 0; index < samples.length; index+=2) {
-            mono[monoIndex] = samples[index] /(32760.0f);
+            mono[monoIndex] = Float.max(-1f, Float.min((samples[index]) / (float) Short.MAX_VALUE, 1f));
             monoIndex++;
         }
-
 
         var params = new WhisperFullParams();
         System.out.println(ctx);

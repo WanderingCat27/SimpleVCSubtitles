@@ -6,9 +6,11 @@ import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
 
 import java.io.*;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 
 public class SubtitlesV2Client implements ClientModInitializer {
@@ -19,7 +21,15 @@ public class SubtitlesV2Client implements ClientModInitializer {
 
     @Override
     public void onInitializeClient() {
+
+        try {
+            downloadFile("https://raw.githubusercontent.com/WanderingCat27/SimpleVCSubtitlesV2/jni/ggml-base.bin", "models", "ggml-base.bin");
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
         Transcriber.init();
+
 
         // read python file
 //        CLASSLOADER = Thread.currentThread().getContextClassLoader();
@@ -63,6 +73,39 @@ public class SubtitlesV2Client implements ClientModInitializer {
         }
 
         return null;
+    }
+
+    public static void downloadFile(String url, String directory, String fileName) throws IOException {
+        Path filePath = Paths.get(directory, fileName);
+
+        // Check if the file already exists in the specified directory
+        if (Files.exists(filePath)) {
+            System.out.println("File already exists: " + filePath);
+            return;
+        }
+
+        // Create the directory if it doesn't exist
+        if (!Files.exists(Paths.get(directory))) {
+            Files.createDirectory(Paths.get(directory));
+        }
+
+        // Open a connection to the URL and create an input stream
+        try (InputStream inputStream = new URL(url).openStream();
+             FileOutputStream outputStream = new FileOutputStream(filePath.toFile())) {
+
+            // Read data from the input stream and write it to the output stream
+            byte[] buffer = new byte[1024];
+            int bytesRead;
+            while ((bytesRead = inputStream.read(buffer)) != -1) {
+                outputStream.write(buffer, 0, bytesRead);
+            }
+
+            System.out.println("File downloaded to: " + filePath);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw e; // Propagate the exception if needed
+        }
     }
 
 

@@ -4,6 +4,7 @@ import io.github.givimad.whisperjni.WhisperContext;
 import io.github.givimad.whisperjni.WhisperFullParams;
 import io.github.givimad.whisperjni.WhisperJNI;
 
+import javax.lang.model.element.ModuleElement;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Path;
@@ -26,7 +27,7 @@ public class Transcriber {
 
 //            URL model = Thread.currentThread().getContextClassLoader().getResource("ggml-base.bin");
            Path model = Path.of("models/ggml-base.bin");
-           ctx = whisper.init(model );
+           ctx = whisper.init(model);
         } catch (IOException e) {
            System.err.println(e.toString());
         }

@@ -2,7 +2,7 @@
 
 (Simple Voice Chat independent plugin Mod)
 
-"working" beta (wip unreleased) of subtitles for simple vc in minecraft. Uses whisper https://github.com/openai/whisper. specifically master branch uses https://github.com/ggerganov/whisper.cpp (working but requires setup steps not currently provided)
+"working" beta (wip unreleased) of subtitles for simple vc in minecraft. Uses whisper https://github.com/openai/whisper, specifically whisper JNI.
 
 version 1.0 should work out of the box and download the model into instance folder, no additional setup
 

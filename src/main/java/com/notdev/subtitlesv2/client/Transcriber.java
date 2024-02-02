@@ -7,6 +7,9 @@ import de.maxhenkel.voicechat.voice.common.Utils;
 import io.github.givimad.whisperjni.WhisperContext;
 import io.github.givimad.whisperjni.WhisperFullParams;
 import io.github.givimad.whisperjni.WhisperJNI;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.hud.SubtitlesHud;
+import net.minecraft.text.Text;
 
 import javax.lang.model.element.ModuleElement;
 import java.io.FileOutputStream;
@@ -21,6 +24,8 @@ public class Transcriber {
 
     private static io.github.givimad.whisperjni.WhisperJNI whisper;
     private static io.github.givimad.whisperjni.WhisperContext ctx;
+
+    public static String lastSubtitle = "";
 
     public static void init() {
         // Get the current working directory
@@ -113,23 +118,21 @@ public class Transcriber {
     }
 
 
-
     public static String Transcribe(short[] shorts) {
-        // voice chat built in method
-        float samples[] = shortsToFloats(shorts);
-        float mono[] = new float[samples.length / 2];
-        for (int index = 0; index < samples.length; index += 4) {
-            // if i throw out a bunch of the data it seems get down to the format that whisper wants
-            mono[index/4] = Float.max(-1f, Float.min((samples[index]) / (float) Short.MAX_VALUE, 1f));
-        }
-//        saveFloatArrayToMp3(mono, 16000, "test.mp3");
+        float[] samples = Utils.shortsToFloats(shorts);
+        float[] mono = new float[samples.length / 2];
+        for (int index = 0; index < samples.length; index += 4)
+            mono[index / 4] = Float.max(-1.0F, Float.min(samples[index] / 32767.0F, 1.0F));
 
-        var params = new WhisperFullParams();
+        WhisperFullParams params = new WhisperFullParams();
         System.out.println(ctx);
         int result = whisper.full(ctx, params, mono, mono.length);
         String text = whisper.fullGetSegmentText(ctx, 0);
         System.out.println(text);
+        lastSubtitle = text;
+
         return text;
+
     }
 
 }

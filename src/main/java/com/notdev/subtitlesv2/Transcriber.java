@@ -116,7 +116,6 @@ public class Transcriber {
         for (int index = 0; index < samples.length; index += 4)
             mono[index / 4] = Float.max(-1.0F, Float.min(samples[index] / 32767.0F, 1.0F));
 
-        System.out.println(Arrays.toString(samples));
         WhisperFullParams params = new WhisperFullParams();
         System.out.println(ctx);
         int result = whisper.full(ctx, params, mono, mono.length);

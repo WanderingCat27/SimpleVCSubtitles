@@ -16,7 +16,6 @@ public class VoiceDataMap {
         ArrayList list = getOrCreate(player);
         for(short sh : data)
             list.add(sh);
-        System.out.println(list.size());
         return list.size() >= 960*bufferSize;
     }
 

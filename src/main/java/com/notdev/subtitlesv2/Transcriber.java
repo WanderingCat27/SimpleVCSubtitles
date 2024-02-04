@@ -1,23 +1,15 @@
-package com.notdev.subtitlesv2.client;
+package com.notdev.subtitlesv2;
 
 import de.maxhenkel.lame4j.Mp3Encoder;
 import de.maxhenkel.lame4j.UnknownPlatformException;
-import de.maxhenkel.voicechat.api.audio.AudioConverter;
 import de.maxhenkel.voicechat.voice.common.Utils;
-import io.github.givimad.whisperjni.WhisperContext;
 import io.github.givimad.whisperjni.WhisperFullParams;
 import io.github.givimad.whisperjni.WhisperJNI;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.hud.SubtitlesHud;
-import net.minecraft.text.Text;
 
-import javax.lang.model.element.ModuleElement;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.net.URL;
 import java.nio.file.Path;
-
-import static de.maxhenkel.voicechat.voice.common.Utils.shortsToFloats;
+import java.util.Arrays;
 
 
 public class Transcriber {
@@ -25,7 +17,6 @@ public class Transcriber {
     private static io.github.givimad.whisperjni.WhisperJNI whisper;
     private static io.github.givimad.whisperjni.WhisperContext ctx;
 
-    public static String lastSubtitle = "";
 
     public static void init() {
         // Get the current working directory
@@ -120,18 +111,21 @@ public class Transcriber {
 
     public static String Transcribe(short[] shorts) {
         float[] samples = Utils.shortsToFloats(shorts);
+
         float[] mono = new float[samples.length / 2];
         for (int index = 0; index < samples.length; index += 4)
             mono[index / 4] = Float.max(-1.0F, Float.min(samples[index] / 32767.0F, 1.0F));
 
+        System.out.println(Arrays.toString(samples));
         WhisperFullParams params = new WhisperFullParams();
         System.out.println(ctx);
         int result = whisper.full(ctx, params, mono, mono.length);
-        String text = whisper.fullGetSegmentText(ctx, 0);
-        System.out.println(text);
-        lastSubtitle = text;
+        if(result == 0) {
+            String text = whisper.fullGetSegmentText(ctx, 0);
 
-        return text;
+            return text;
+        }
+        return "";
 
     }
 

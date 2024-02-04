@@ -1,23 +1,25 @@
-package com.notdev.subtitlesv2.client;
+package com.notdev.subtitlesv2;
 
+import de.maxhenkel.voicechat.api.Player;
 import de.maxhenkel.voicechat.api.VoicechatApi;
 import de.maxhenkel.voicechat.api.events.ClientReceiveSoundEvent;
 import de.maxhenkel.voicechat.api.events.EventRegistration;
-import net.minecraft.client.gui.hud.SubtitlesHud;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.server.PlayerManager;
+import net.minecraft.server.ServerMetadata;
+import net.minecraft.util.Uuids;
 
 import javax.sound.sampled.AudioFormat;
 
 public class VoicechatPlugin implements de.maxhenkel.voicechat.api.VoicechatPlugin {
 
-    private final static int max = 200;
-    private int bufferIndex = 0;
-    private short[] buffer = new short[960 * (max + 2)];
 
     static AudioFormat stereoFormat = new AudioFormat(AudioFormat.Encoding.PCM_SIGNED, 16000, 16, 2, 2, 16000, true);
 
     @Override
     public String getPluginId() {
-        return SubtitlesV2Client.MOD_ID;
+        return SubtitlesClient.MOD_ID;
     }
 
     @Override
@@ -34,15 +36,10 @@ public class VoicechatPlugin implements de.maxhenkel.voicechat.api.VoicechatPlug
     }
 
     private void receiveSound(ClientReceiveSoundEvent.EntitySound entitySound) {
-        if (bufferIndex >= max * 960) {
-
-//            SubtitlesV2Client.sendMessage(Transcriber.Transcribe(buffer));
-            Transcriber.Transcribe(buffer);
-            buffer = new short[960 * (max + 2)];
-            bufferIndex = 0;
+        PlayerEntity sender = MinecraftClient.getInstance().world.getPlayerByUuid(entitySound.getId());
+        if(VoiceDataMap.append(sender.getNameForScoreboard(), entitySound.getRawAudio())) {
+            // transcribes text into a subtitle [<ign>]: <transcription>
+            SubtitlesHandler.add(String.format("[%s]: %s",sender.getNameForScoreboard().toUpperCase(), Transcriber.Transcribe(VoiceDataMap.remove(sender.getNameForScoreboard()))));
         }
-        for (short bit : entitySound.getRawAudio())
-                buffer[bufferIndex++] = bit;
-        bufferIndex++;
     }
 }

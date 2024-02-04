@@ -13,10 +13,10 @@
   "environment": "client",
   "entrypoints": {
     "client": [
-      "com.notdev.subtitlesv2.client.SubtitlesV2Client"
+      "com.notdev.subtitlesv2.SubtitlesClient"
     ],
     "voicechat": [
-      "com.notdev.subtitlesv2.client.VoicechatPlugin"
+      "com.notdev.subtitlesv2.VoicechatPlugin"
     ]
   },
   "depends": {

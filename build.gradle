@@ -50,8 +50,8 @@ dependencies {
 
     // Fabric API. This is technically optional, but you probably want it anyway.
     modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
-    implementation(files('lib/whisper-jni-1.5.2.jar'))
-    runtimeOnly(files('lib/whisper-jni-1.5.2.jar'))
+    implementation("io.github.givimad:whisper-jni:1.5.2")
+    runtimeOnly("io.github.givimad:whisper-jni:1.5.2")
 
     implementation "de.maxhenkel.voicechat:voicechat-api:${voicechat_api_version}"
 

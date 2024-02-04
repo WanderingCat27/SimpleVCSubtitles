@@ -37,9 +37,9 @@ public class VoicechatPlugin implements de.maxhenkel.voicechat.api.VoicechatPlug
 
     private void receiveSound(ClientReceiveSoundEvent.EntitySound entitySound) {
         PlayerEntity sender = MinecraftClient.getInstance().world.getPlayerByUuid(entitySound.getId());
-        if(VoiceDataMap.append(sender.getNameForScoreboard(), entitySound.getRawAudio())) {
+        if(VoiceDataMap.append(sender.getDisplayName().getString(), entitySound.getRawAudio())) {
             // transcribes text into a subtitle [<ign>]: <transcription>
-            SubtitlesHandler.add(String.format("[%s]: %s",sender.getNameForScoreboard().toUpperCase(), Transcriber.Transcribe(VoiceDataMap.remove(sender.getNameForScoreboard()))));
+            SubtitlesHandler.add(String.format("[%s]: %s",sender.getDisplayName().getString(), Transcriber.Transcribe(VoiceDataMap.remove(sender.getDisplayName().getString()))));
         }
     }
 }

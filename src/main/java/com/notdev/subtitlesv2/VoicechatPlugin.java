@@ -11,6 +11,7 @@ import net.minecraft.server.ServerMetadata;
 import net.minecraft.util.Uuids;
 
 import javax.sound.sampled.AudioFormat;
+import java.util.UUID;
 
 public class VoicechatPlugin implements de.maxhenkel.voicechat.api.VoicechatPlugin {
 
@@ -33,11 +34,20 @@ public class VoicechatPlugin implements de.maxhenkel.voicechat.api.VoicechatPlug
         de.maxhenkel.voicechat.api.VoicechatPlugin.super.registerEvents(registration);
 
         registration.registerEvent(ClientReceiveSoundEvent.EntitySound.class, this::receiveSound);
+        registration.registerEvent(ClientReceiveSoundEvent.StaticSound.class, this::receiveStaticSound);
+    }
+
+    private void receiveStaticSound(ClientReceiveSoundEvent.StaticSound staticSound) {
+        processSound(staticSound.getId(), staticSound.getRawAudio());
     }
 
     private void receiveSound(ClientReceiveSoundEvent.EntitySound entitySound) {
-        PlayerEntity sender = MinecraftClient.getInstance().world.getPlayerByUuid(entitySound.getId());
-        if(VoiceDataMap.append(sender.getDisplayName().getString(), entitySound.getRawAudio())) {
+        processSound(entitySound.getId(), entitySound.getRawAudio());
+    }
+    private static void processSound(UUID uuid, short[] rawAudio) {
+        PlayerEntity sender = MinecraftClient.getInstance().world.getPlayerByUuid(uuid);
+        if(sender != null)
+        if(VoiceDataMap.append(sender.getDisplayName().getString(), rawAudio)) {
             // transcribes text into a subtitle [<ign>]: <transcription>
             SubtitlesHandler.add(String.format("[%s]: %s",sender.getDisplayName().getString(), Transcriber.Transcribe(VoiceDataMap.remove(sender.getDisplayName().getString()))));
         }

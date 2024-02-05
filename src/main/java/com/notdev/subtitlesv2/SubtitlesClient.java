@@ -21,12 +21,19 @@ public class SubtitlesClient implements ClientModInitializer {
     private static String tinyURL = "https://ggml.ggerganov.com/ggml-model-whisper-tiny.bin";
     private static String smallURL = "https://ggml.ggerganov.com/ggml-model-whisper-small.bin";
 
+    private static String DISTILL_EN_SMALL_URL = "https://huggingface.co/distil-whisper/distil-small.en/resolve/main/ggml-distil-small.en.bin?download=true";
+
+    public static String basePath = "ggml-base.bin";
+    public static String tinyPath = "ggml-tiny.bin";
+    public static String smallPath = "ggml-small.bin";
+    public static String DISTIlL_EN_SMALL_PATH = "distill-small.bin";
+
 
     @Override
     public void onInitializeClient() {
         SubtitlesHandler.init();
         try {
-            downloadFile(baseURL, "models", "ggml-base.bin");
+            downloadFile(tinyURL, "models", tinyPath);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

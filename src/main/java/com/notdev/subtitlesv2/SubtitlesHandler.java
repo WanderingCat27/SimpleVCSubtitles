@@ -5,6 +5,7 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.text.Text;
 
 import java.util.ArrayList;
+import java.util.ConcurrentModificationException;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -42,11 +43,16 @@ public class SubtitlesHandler {
 
     public static void draw(DrawContext matrixStack) {
         int index = 0;
-        for(String subtitle : subtitles) {
-            for (String line : wrapText(subtitle, 50)) {
-                MinecraftClient.getInstance().inGameHud.getTextRenderer().drawWithOutline(Text.of(line).asOrderedText(), 10, 10 + index * 10, textColor, bgColor, matrixStack.getMatrices().peek().getPositionMatrix(), matrixStack.getVertexConsumers(), 255);
-                index++;
+        try {
+            for (String subtitle : subtitles) {
+                if (subtitle != null)
+                    for (String line : wrapText(subtitle, 50)) {
+                        MinecraftClient.getInstance().inGameHud.getTextRenderer().drawWithOutline(Text.of(line).asOrderedText(), 10, 10 + index * 10, textColor, bgColor, matrixStack.getMatrices().peek().getPositionMatrix(), matrixStack.getVertexConsumers(), 255);
+                        index++;
+                    }
             }
+        }catch (ConcurrentModificationException e) {
+
         }
 
 

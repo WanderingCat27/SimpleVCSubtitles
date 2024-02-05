@@ -5,6 +5,7 @@ import de.maxhenkel.lame4j.UnknownPlatformException;
 import de.maxhenkel.voicechat.voice.common.Utils;
 import io.github.givimad.whisperjni.WhisperFullParams;
 import io.github.givimad.whisperjni.WhisperJNI;
+import io.github.givimad.whisperjni.WhisperSamplingStrategy;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -27,96 +28,44 @@ public class Transcriber {
             whisper = new WhisperJNI();
 
 //            URL model = Thread.currentThread().getContextClassLoader().getResource("ggml-base.bin");
-            Path model = Path.of("models/ggml-base.bin");
+            Path model = Path.of("models/" + SubtitlesClient.tinyPath);
             ctx = whisper.init(model);
         } catch (IOException e) {
             System.err.println(e.toString());
         }
 
     }
+        public static float[] convertStereoToMonoFloat(short[] stereoData) {
+            int stereoLength = stereoData.length;
+            int monoLength = stereoLength / 2; // Assuming stereoData is interleaved left-right.
 
+            float[] monoData = new float[monoLength];
 
-    // tried but only kinda works
-    private static float[] toFloat(short[] shorts) {
-        // transform the samples to f32 samples
-        float[] samples = new float[shorts.length];
-        for (int i = 0; i < samples.length; i++)
-            samples[i] = Float.max(-1f, Float.min(((float) shorts[i]) / (float) Short.MAX_VALUE, 1f));
-        return samples;
-    }
+            for (int i = 0, j = 0; i < stereoLength; i += 2, j++) {
+                int leftSample = stereoData[i];
+                int rightSample = stereoData[i + 1];
 
+                // Combine left and right samples and convert to float between -1 and 1.
+                float monoSample = (float) (leftSample + rightSample) / (float) Short.MAX_VALUE / 2;
 
-    private static float[] toFloat2(short[] shorts) {
-        // transform the samples to f32 samples
-        float[] samples = new float[shorts.length / 2];
+                // Store the float mono sample.
+                monoData[j] = monoSample;
+            }
 
-        for (int i = 0; i < samples.length; i += 2)
-            samples[i / 2] = (float) (short) ((shorts[i] & 0xFF) + ((shorts[i + 1] & 0xFF) << 8));
-        return samples;
-    }
-
-
-    private static float[] shortToByteTofloat(short[] shorts) {
-        byte[] bytes = shortToBytes(shorts);
-        float[] floats = new float[bytes.length / 2];
-        for (int i = 0; i < bytes.length; i += 2) {
-            floats[i / 2] = bytes[i] | (bytes[i + 1] < 128 ? (bytes[i + 1] << 8) : ((bytes[i + 1] - 256) << 8));
+            return monoData;
         }
-        return floats;
-    }
-
-    private static byte[] shortToBytes(short[] shorts) {
-        byte[] bytes = new byte[shorts.length * 2];
-        for (int index = 0; index < bytes.length; index += 2) {
-            bytes[index] = (byte) (shorts[index / 2] >> 8);
-            bytes[index + 1] = (byte) shorts[index / 2];
-        }
-
-        return bytes;
-    }
-
-    private static float[] toFloat3(short[] audioShorts) {
-        float[] audioFloats = new float[audioShorts.length];
-        for (int i = 0; i < audioShorts.length; i++)
-            audioFloats[i] = ((float) audioShorts[i]) / 0x8000;
-        return audioFloats;
-    }
-
-    public static void saveFloatArrayToMp3(float[] audioData, int sampleRate, String filePath) {
-        // Convert float array to 16-bit signed PCM
-        short[] pcmData = floatArrayTo16BitPCM(audioData);
-
-        try (FileOutputStream fileOutputStream = new FileOutputStream(filePath);
-             // i think this is roughly the format expected by whisper jni
-             Mp3Encoder mp3Encoder = new Mp3Encoder(1, (int) 16000, 16, 5, fileOutputStream)) {
-
-            // Encode and save the audio data
-            mp3Encoder.write(pcmData);
-
-        } catch (IOException | UnknownPlatformException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private static short[] floatArrayTo16BitPCM(float[] floatArray) {
-        short[] pcmData = new short[floatArray.length];
-
-        for (int i = 0; i < floatArray.length; i++) {
-            pcmData[i] = (short) (floatArray[i] * (Short.MAX_VALUE));
-        }
-
-        return pcmData;
-    }
 
 
     public static String Transcribe(short[] shorts) {
-        float[] samples = Utils.shortsToFloats(shorts);
+//        float[] samples = Utils.shortsToFloats(shorts);
+//
+//        float[] mono = new float[samples.length / 2];
+//        for (int index = 0; index < samples.length; index += 4)
+//            mono[index / 4] = Float.max(-1.0F, Float.min(samples[index] / 32767.0F, 1.0F));
 
-        float[] mono = new float[samples.length / 2];
-        for (int index = 0; index < samples.length; index += 4)
-            mono[index / 4] = Float.max(-1.0F, Float.min(samples[index] / 32767.0F, 1.0F));
-
+        float[] mono = convertStereoToMonoFloat(shorts);
         WhisperFullParams params = new WhisperFullParams();
+//        WhisperFullParams params = new WhisperFullParams(WhisperSamplingStrategy.BEAN_SEARCH);
         System.out.println(ctx);
         int result = whisper.full(ctx, params, mono, mono.length);
         if(result == 0) {

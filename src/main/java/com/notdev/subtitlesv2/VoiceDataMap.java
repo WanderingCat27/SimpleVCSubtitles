@@ -6,7 +6,7 @@ import java.util.Map;
 
 public class VoiceDataMap {
     private static Map<String, ArrayList<Short>> map = new HashMap<String, ArrayList<Short>>();
-    private static int bufferSize = 200;
+    private static int bufferSize = 120;
 
     //static class
     private VoiceDataMap() {}
